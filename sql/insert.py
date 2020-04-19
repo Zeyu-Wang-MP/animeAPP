@@ -12,7 +12,9 @@ ANIME_URL = "https://www.anime-planet.com/anime"
 CACHE_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anime.json')
 DB_FILENAME = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'var', 'anime.sqlite3')
 CRAWL_DELAY = 1
-CRAWL_PAGE_NUMBER = 35
+#current I have crawled 36 pages
+START_PAGE = 36
+CRAWL_PAGE_NUMBER = 1
 class Anime:
     '''attribute:
     name : str
@@ -119,7 +121,7 @@ def crawlListAndInsert():
     '''
     animeList = []
     listUrl = getAnimeListUrl()
-    for pageNumber in range(1, 1 + CRAWL_PAGE_NUMBER):
+    for pageNumber in range(START_PAGE, START_PAGE + CRAWL_PAGE_NUMBER):
         params = {
             "page" : pageNumber
         }
@@ -207,29 +209,26 @@ def loadDB():
     ----------
     animeList : list of anime object
     '''
-    animeNameSet = set()
-    tagSet = set()
-    stuffNameSet = set()
-    mangaNameSet = set()
-    relatedAnimePairSet = set()
     conn = sqlite3.connect(DB_FILENAME)
     animeList = crawlListAndInsert()
     
     for anime in animeList:
-
+        animeCount = conn.execute("select count(*) from anime where imgUrl = ?", (anime.imgUrl, )).fetchone()[0]
+        #if we already load this anime
+        if animeCount == 1:
+            print(anime.name, "is already loaded, skip this anime")
+            continue
         print("insert ", anime.name)
         #insert this anime to anime table
-        animeNameSet.add(anime.name)
-        # insertAnimeQuery = '''insert into anime values(null, '{anime.name}', '{anime.description}', '{anime.imgUrl}')'''
         insertAnimeQuery = "insert into anime values(null, ?, ?, ?)"
         conn.execute(insertAnimeQuery, (anime.name, anime.description, anime.imgUrl))
         #for each tag for this anime
         for tag in anime.tags:
-            #if we already see this tag
-            if tag in tagSet:
+            countTag = conn.execute("select count(*) from tags where content = ?", (tag, )).fetchone()[0]
+            #if we have already seen this tag
+            if countTag == 1:
                 pass
             else:
-                tagSet.add(tag)
                 conn.execute("insert into tags values(null, ?)", (tag,))
             conn.commit()
             insertAnimeTagQuery = '''insert into animeTag values(
@@ -240,10 +239,10 @@ def loadDB():
             conn.execute(insertAnimeTagQuery, (tag, anime.name))
         #for each stuff in this anime's stuff list
         for stuff in anime.stuffs:
-            if stuff.name in stuffNameSet:
+            countStuff = conn.execute("select count(*) from stuffs where stuffName = ?", (stuff.name, )).fetchone()[0]
+            if countStuff == 1:
                 pass
             else:
-                stuffNameSet.add(stuff.name)
                 conn.execute("insert into stuffs values(null, ?, ?)", (stuff.name, stuff.title))
             conn.commit()
             insertProduceQuery = '''insert into produce values(
@@ -254,10 +253,10 @@ def loadDB():
             conn.execute(insertProduceQuery, (stuff.name, anime.name))
         #for each manga in this anime's manga list
         for manga in anime.relatedManga:
-            if manga.name in mangaNameSet:
+            mangaCount = conn.execute("select count(*) from mangas where mangaName = ?", (manga.name, )).fetchone()[0]
+            if mangaCount == 1:
                 pass
             else:
-                mangaNameSet.add(manga.name)
                 conn.execute("insert into mangas values(null, ?, ?)", (manga.name, manga.imgUrl))
             conn.commit()
             insertRelatedMangaQuery = '''insert into relatedManga values(
@@ -269,24 +268,28 @@ def loadDB():
     
     conn.commit()
     for anime in animeList:
+        
         print("insert ", anime.name, "'s related anime")
         #for each related in this anime's related anime list
         for animeName in anime.relatedAnime:
+            countAnime = conn.execute("select count(*) from anime where animeName = ?", (animeName, )).fetchone()[0]
             #if we had added this anime into database
-            if animeName in animeNameSet:
+            if countAnime == 1:
                 animeID1 = int(conn.execute("select animeID from anime where animeName = ?", (anime.name, )).fetchone()[0])
                 animeID2 = int(conn.execute("select animeID from anime where animeName = ?", (animeName, )).fetchone()[0])
                 if animeID1 > animeID2:
                     temp = animeID1
                     animeID1 = animeID2
                     animeID2 = temp
-                identifier = str(animeID1) + " " + str(animeID2)
+                animePairCount = conn.execute("select count(*) from relatedAnime where animeID1 = ? and animeID2 = ?", (animeID1, animeID2)).fetchone()[0]
                 #if we already added this pair
-                if identifier in relatedAnimePairSet:
+                if animePairCount == 1:
                     pass
                 else:
-                    relatedAnimePairSet.add(identifier)
-                    conn.execute("insert into relatedAnime values(?, ?)", (animeID1, animeID2))
+                    try:
+                        conn.execute("insert into relatedAnime values(?, ?)", (animeID1, animeID2))
+                    except:
+                        print("this pair already exist!")
             #if we have not added this anime, we can't put this in db
             else:
                 pass
