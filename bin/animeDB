@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+
+
+
+# Sanity check command line options
+usage() {
+  echo "Usage: $0 (create|insert|destroy)"
+}
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+# Parse argument.  $1 is the first argument
+case $1 in
+  "create")
+    if [ -e var/anime.sqlite3 ]
+    then
+      echo "Error: database already exists"
+    else
+      sqlite3 var/anime.sqlite3 < sql/schema.sql
+    fi
+    ;;
+
+  "insert")
+    python3 sql/insert.py
+    ;;
+  
+  "destroy")
+    rm -rf var/anime.sqlite3
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

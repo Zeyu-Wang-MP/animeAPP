@@ -1,0 +1,5 @@
+.vscode
+anime.egg-info
+__pycache__
+env
+anime.json
