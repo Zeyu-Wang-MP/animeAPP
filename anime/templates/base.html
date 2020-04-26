@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Anime Site</title>
+    <link rel="stylesheet" href="{{url_for('static', filename = 'css/style.css')}}"/>
+</head>
+<body>
+    <a href = {{ url_for('index') }}>
+        <h1 class = "animePageTitle">Return to main page</h1>
+    </a>
+
+    {% block body %}
+    {% endblock body %}
+</body>
+</html>

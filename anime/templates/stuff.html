@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="animeWithStuff">
+    <h2 class="animePageTitle">Animes produced by {{stuff}}: </h2>
+    <ul>
+        {% for eachAnime in animeList %}
+            <li class="card">
+                <a href={{ url_for('animeName', name = eachAnime.name) }}>
+                    <img src = {{ eachAnime.imgUrl }} width="142" height="180" />
+                </a>
+                <h4 class="cardname">{{ eachAnime.name }}</h4>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock body %}

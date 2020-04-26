@@ -3,7 +3,6 @@
 
 
 set -Eeuo pipefail
-set -x
 
 rm -rf env anime.egg-info
 python3 -m venv env 

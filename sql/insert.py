@@ -12,7 +12,7 @@ ANIME_URL = "https://www.anime-planet.com/anime"
 CACHE_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anime.json')
 DB_FILENAME = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'var', 'anime.sqlite3')
 CRAWL_DELAY = 1
-#current I have crawled 36 pages
+#current I have crawled 36 list pages
 START_PAGE = 36
 CRAWL_PAGE_NUMBER = 1
 class Anime:

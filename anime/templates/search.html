@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="searchContainer">
+    <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data">
+        <input type="text" name="animeName" placeholder="Please input the anime name you want to search"/>
+        <br/>
+        <input type="submit" name="search" value="search"/>
+    </form>
+</div>
+
+{% if len == 0 %}
+    <h1 class="animePageTitle">Seems there are no animes start with "{{searchName}}"</h1>
+    <h1 class="animePageTitle">Please try another name!</h1>
+{% else %}
+    <h1 class="animePageTitle">{{len}} animes start with "{{ searchName }}":</h2>
+    <ul>
+        {% for eachAnime in animeList %}
+        <li class = "card">
+            <a href = "{{ url_for('animeName', name = eachAnime.name) }}">
+                <img src = {{ eachAnime.imgUrl }} width="142" height="180" />
+                <h4 class = "cardname">{{ eachAnime.name }}</h4>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock body %}

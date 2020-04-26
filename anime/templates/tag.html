@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="animeWithTag">
+    {% if animeList|length == 0 %}
+        <h2 class="animePageTitle"> It seems like we reach the end....</h2>
+    {% else %}
+        <h2 class="animePageTitle">Animes with "{{tag}}" tag: </h2>
+        <ul>
+            {% for eachAnime in animeList %}
+                <li class="card">
+                    <a href={{ url_for('animeName', name = eachAnime.name) }}>
+                        <img src = {{ eachAnime.imgUrl }} width="142" height="180" />
+                    </a>
+                    <h4 class="cardname">{{ eachAnime.name }}</h4>
+                </li>
+            {% endfor %}
+        </ul>
+        <h2>This is page {{currPage}}</h2>
+        <a href={{ url_for('animeTag', tag = tag, page = currPage + 1) }}>
+            <h2 class="animePageTitle">Go to next page!</h2>
+        </a>
+    {% endif %}
+    {% if currPage > 0 %}
+        <a href={{ url_for('animeTag', tag = tag, page = currPage - 1) }}>
+            <h2 class="animePageTitle">Return to last page!</h2>
+        </a>
+    {% endif %}
+</div>
+
+{% endblock body %}
