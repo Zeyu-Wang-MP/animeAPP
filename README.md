@@ -9,7 +9,8 @@ Instruction:
    "chmod +x bin/animeAPPrun" first. This command will activate the virtual environment and run the app.
 3. copy the IP address from the terminal and paste it in your chrome search bar
 
-anime: app package
-bin: directory of some shell scripts (don't run animeDB)
-sql: db schema file and python crawler file
-var: sqlite db file
+File organization:
+1. anime: app package.
+2. bin: directory of some shell scripts (don't run animeDB).
+3. sql: db schema file and python crawler file.
+4. var: sqlite db file.
