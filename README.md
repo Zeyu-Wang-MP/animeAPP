@@ -1,5 +1,4 @@
 # animeAPP
-This is a course project for SI507 in University of Michigan.
 To use this application, you should use linux environment or WSL in windows.
 Instruction:
 1. in the root directory of this app, run "./bin/installEnv" command, if it says something like "Permission denied", you should run
